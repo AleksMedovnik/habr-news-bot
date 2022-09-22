@@ -5,7 +5,7 @@ from telebot import types
 from bs4 import BeautifulSoup as bs
 
 
-bot = telebot.TeleBot('5332131635:AAEv9FtOmTZY8TiZmLJ2xqa3MsEdZwz94AA')
+bot = telebot.TeleBot('...')
 URL = 'https://habr.com/ru/news/'
 
 
