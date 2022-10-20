@@ -9,31 +9,27 @@ bot = telebot.TeleBot('...')
 URL = 'https://habr.com/ru/news/'
 
 
-def build_menu(buttons, n_cols):
-	return [buttons[i:i + n_cols] for i in range(0, len(buttons), n_cols)]
-
-def parser_data(url):
-	req = bs(requests.get(url).text, 'html.parser')
-	list_data = []
-	for link in req.find_all('a', class_='tm-article-snippet__title-link'):
-		list_data.append(
-			types.InlineKeyboardButton(text=link.text, url=f"https://habr.com{link.get('href')}")
-		)
-	return list_data
-
-
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-	bot.send_message(message.chat.id, f'Привет, {message.from_user.first_name}!')
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.add(types.KeyboardButton('/showNews'))
+    bot.send_message(
+        message.chat.id,
+        f'Привет, {message.from_user.first_name}!',
+        reply_markup=markup
+    )
 
 
-@bot.message_handler(content_types=["text"])
+@bot.message_handler(commands=['showNews'])
 def show_data(message):
-	markup = types.InlineKeyboardMarkup(build_menu(parser_data(URL), n_cols=1))
-	bot.send_message(
-		chat_id=message.chat.id,
-		text='News from Habr',
-		reply_markup=markup)
+    req = bs(requests.get(URL).text, 'html.parser')
+    text = ''
+    for link in req.find_all('a', class_='tm-article-snippet__title-link'):
+        text += f'{link.text} https://habr.com{link.get("href")}\n'
+    bot.send_message(
+        chat_id=message.chat.id,
+        text=text
+    )
 
 
 bot.polling(none_stop=True)
